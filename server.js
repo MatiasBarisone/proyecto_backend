@@ -2,6 +2,8 @@ const express = require('express');
 const { Employees } = require('./src/modelos/employees');
 const { Product } = require('./src/modelos/product');
 const { sequelize } = require('./src/conexion/connection');
+const { where } = require('sequelize');
+const {Op} = require('sequelize');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -47,7 +49,18 @@ app.get('/productos/:productID', async (req, res) => {
   }
 });
 
-
+// BUSQUEDA POR CATEGORIA
+app.get('/categoria/:CategoryID', async (req, res) => {
+  try {
+    const { CategoryID } = req.params;
+    const product = await Product.findAll({where: {CategoryID}});
+    product ? res.json(product) 
+            : res.status(404).json({ message: 'Producto no encontrado' });
+  } catch (error) {
+    console.error('Error al obtener el producto:', error);
+    res.status(500).json({ error: 'Ocurrió un error al obtener el producto' });
+  }
+});
 
 
 
