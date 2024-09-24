@@ -6,6 +6,13 @@ const { sequelize } = require('./src/conexion/connection');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+//Middleware
+
+
+
+
+
+
 // Conectar a la base de datos antes de iniciar el servidor
 sequelize.authenticate()
   .then(() => {
@@ -24,7 +31,8 @@ sequelize.authenticate()
 app.get('/productos', async (req, res) => {
   try {
     const products = await Product.findAll();
-    res.status(200).res.json(products);
+    products.lenght > 0 ?res.status(200).res.json(products)
+    : res.status(404).json({ message: 'No hay productos registrados' });
   } catch (error) {
     console.error('Error al obtener los productos:', error);
     res.status(500).json({ error: 'Ocurrió un error al obtener los productos' });
@@ -35,7 +43,8 @@ app.get('/productos', async (req, res) => {
 app.get('/empleados', async (req, res) => {
   try {
     const employees = await Employees.findAll();
-    res.status(200).res.json(employees);
+    employees.length > 0 ? res.status(200).res.json(employees)
+    : res.status(404).json({ message: 'No hay empleados registrados' });
   } catch (error) {
     console.error('Error al obtener los empleados:', error);
     res.status(500).json({ error: 'Ocurrió un error al obtener los empleados' });
