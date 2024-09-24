@@ -1,4 +1,0 @@
-DATABASE = northwind
-DBUSER = <youruser>
-PASSWORD = <yourpassword>
-HOST = localhost
