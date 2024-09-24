@@ -50,7 +50,7 @@ app.get('/productos/:productID', async (req, res) => {
 });
 
 // BUSQUEDA POR CATEGORIA
-app.get('/categoria/:CategoryID', async (req, res) => {
+app.get('productos/categoria/:CategoryID', async (req, res) => {
   try {
     const { CategoryID } = req.params;
     const product = await Product.findAll({where: {CategoryID}});
@@ -61,6 +61,28 @@ app.get('/categoria/:CategoryID', async (req, res) => {
     res.status(500).json({ error: 'Ocurrió un error al obtener el producto' });
   }
 });
+
+// BUSQUEDA POR QUERY
+app.get('/productos/buscar/:query', async (req, res) => {
+  try {
+    const { query } = req.params;
+    const products = await Product.findAll({
+      where: {
+        productName: {
+          [Op.like]: `%${query}%` // Usamos LIKE en lugar de ILIKE
+        }
+      }
+    });
+
+    products.length > 0 
+      ? res.json(products) 
+      : res.status(404).json({ message: 'Producto no encontrado' });
+  } catch (error) {
+    console.error('Error al obtener los productos:', error);
+    res.status(500).json({ error: 'Ocurrió un error al obtener los productos' });
+  }
+});
+
 
 
 
