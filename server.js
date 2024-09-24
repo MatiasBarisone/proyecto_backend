@@ -28,7 +28,10 @@ sequelize.authenticate()
 // Endpoint para obtener todos los productos
 app.get('/productos', async (req, res) => {
   try {
-    const products = await Product.findAll();
+    const products = await Product.findAll(
+      //ORDERNAR POR:
+      {order: [['CategoryID','ASC'],['productName','DESC']]}
+    );
     res.json(products);
   } catch (error) {
     console.error('Error al obtener los productos:', error);
@@ -91,11 +94,11 @@ app.get('/productos/importeMayor/:query', async (req, res) => {
       where: {
         UnitPrice: {
           [Op.gt]: query
-        }
-      }
+        }},
+        //ORDENAR POR:
+        order: [['UnitPrice','ASC']]
     });
-
-    products.length > 0 
+    products.length 
       ? res.json(products) 
       : res.status(404).json({ message: 'Producto no encontrado' });
   } catch (error) {
