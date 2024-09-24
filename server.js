@@ -1,8 +1,8 @@
 const express = require('express');
 const { Employees } = require('./src/modelos/employees');
 const { Product } = require('./src/modelos/product');
+const { ProductCategoryView } = require('./src/modelos/productsandcategories');
 const { sequelize } = require('./src/conexion/connection');
-const { where } = require('sequelize');
 const {Op} = require('sequelize');
 
 const app = express();
@@ -77,7 +77,7 @@ app.get('/productos/buscar/:query', async (req, res) => {
       }
     });
 
-    products.length > 0 
+    products.length
       ? res.json(products) 
       : res.status(404).json({ message: 'Producto no encontrado' });
   } catch (error) {
