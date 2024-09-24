@@ -83,6 +83,26 @@ app.get('/productos/buscar/:query', async (req, res) => {
   }
 });
 
+// BUSQUEDA POR IMPORTE MAYOR CON OPERADOR
+app.get('/productos/importeMayor/:query', async (req, res) => {
+  try {
+    const { query } = req.params;
+    const products = await Product.findAll({
+      where: {
+        UnitPrice: {
+          [Op.gt]: query
+        }
+      }
+    });
+
+    products.length > 0 
+      ? res.json(products) 
+      : res.status(404).json({ message: 'Producto no encontrado' });
+  } catch (error) {
+    console.error('Error al obtener los productos:', error);
+    res.status(500).json({ error: 'Ocurrió un error al obtener los productos' });
+  }
+});
 
 
 
