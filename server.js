@@ -6,10 +6,6 @@ const { sequelize } = require('./src/conexion/connection');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-//Middleware
-
-
-
 
 
 
@@ -31,20 +27,35 @@ sequelize.authenticate()
 app.get('/productos', async (req, res) => {
   try {
     const products = await Product.findAll();
-    products.lenght > 0 ?res.status(200).res.json(products)
-    : res.status(404).json({ message: 'No hay productos registrados' });
+    res.json(products);
   } catch (error) {
     console.error('Error al obtener los productos:', error);
     res.status(500).json({ error: 'Ocurrió un error al obtener los productos' });
   }
 });
 
+// BUSQUEDA POR ID
+app.get('/productos/:productID', async (req, res) => {
+  try {
+    const { productID } = req.params;
+    const product = await Product.findByPk(productID);
+    product ? res.json(product) 
+            : res.status(404).json({ message: 'Producto no encontrado' });
+  } catch (error) {
+    console.error('Error al obtener el producto:', error);
+    res.status(500).json({ error: 'Ocurrió un error al obtener el producto' });
+  }
+});
+
+
+
+
+
 // Endpoint para obtener todos los empleados
 app.get('/empleados', async (req, res) => {
   try {
     const employees = await Employees.findAll();
-    employees.length > 0 ? res.status(200).res.json(employees)
-    : res.status(404).json({ message: 'No hay empleados registrados' });
+    res.json(employees);
   } catch (error) {
     console.error('Error al obtener los empleados:', error);
     res.status(500).json({ error: 'Ocurrió un error al obtener los empleados' });
