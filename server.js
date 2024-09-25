@@ -39,6 +39,21 @@ app.get('/productos', async (req, res) => {
   }
 });
 
+//VIEW CON MYSQL WORKBENCH
+app.get('/productsandcategories', async (req, res) => {
+  try {
+    const products = await Product.findAll(
+      //ORDERNAR POR:
+      {order: [['CategoryID','ASC'],['productName','DESC']]}
+    );
+    res.json(products);
+  } catch (error) {
+    console.error('Error al obtener los productos:', error);
+    res.status(500).json({ error: 'Ocurrió un error al obtener los productos' });
+  }
+});
+
+
 // BUSQUEDA POR ID
 app.get('/productos/:productID', async (req, res) => {
   try {
