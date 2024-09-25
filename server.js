@@ -2,9 +2,11 @@ const express = require('express');
 const { Employees } = require('./src/modelos/employees');
 const { Product } = require('./src/modelos/product');
 const { ProductCategoryView } = require('./src/modelos/productsandcategories');
+const { VistaOrderDetails } = require('./src/modelos/VistaOrderDetails');
+
+
 const { sequelize } = require('./src/conexion/connection');
 const {Op} = require('sequelize');
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -39,17 +41,33 @@ app.get('/productos', async (req, res) => {
   }
 });
 
-//VIEW CON MYSQL WORKBENCH
-app.get('/productsandcategories', async (req, res) => {
+//VIEW CON MYSQL WORKBENCH DE ORDENES JUNTANDO DOS TABLAS
+app.get('/VistaOrderDetails', async (req, res) => {
   try {
-    const products = await Product.findAll(
-    );
-    res.json(products);
+    const { orderId } = req.query; // Recibir OrderID como parámetro de consulta
+
+    let orders;
+    if (orderId) {
+      // Si se recibe un OrderID, filtrar por ese OrderID
+      orders = await VistaOrderDetails.findAll({
+        where: { OrderID: orderId },
+        order: [['ProductID', 'DESC']] // Ordenar por ProductID descendente
+      });
+    } else {
+      // Si no se recibe un OrderID, traer todas las órdenes
+      orders = await VistaOrderDetails.findAll({
+        order: [['ProductID', 'DESC']] // Ordenar por ProductID descendente
+      });
+    }
+
+    // Enviar la respuesta con los resultados
+    res.json(orders);
   } catch (error) {
-    console.error('Error al obtener los productos:', error);
-    res.status(500).json({ error: 'Ocurrió un error al obtener los productos' });
+    console.error('Error al obtener las órdenes:', error);
+    res.status(500).send('Error al obtener las órdenes');
   }
 });
+
 
 
 // BUSQUEDA POR ID
