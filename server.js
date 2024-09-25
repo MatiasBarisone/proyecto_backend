@@ -68,7 +68,18 @@ app.get('/VistaOrderDetails/orders/:OrderID', async (req, res) => {
   }
 });
 
-
+// BUSQUEDA POR PRODUCTOS Y CATEGORIAS
+app.get('/productsandcategories', async (req, res) => {
+  try {
+    const { productsandcategories } = req.params;
+    const product = await Product.findAll(productsandcategories);
+    product ? res.json(product) 
+            : res.status(404).json({ message: 'Producto no encontrado' });
+  } catch (error) {
+    console.error('Error al obtener el producto:', error);
+    res.status(500).json({ error: 'Ocurrió un error al obtener el producto' });
+  }
+});
 
 // BUSQUEDA POR ID
 app.get('/productos/:productID', async (req, res) => {
