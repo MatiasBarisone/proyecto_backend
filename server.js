@@ -43,8 +43,6 @@ app.get('/productos', async (req, res) => {
 app.get('/productsandcategories', async (req, res) => {
   try {
     const products = await Product.findAll(
-      //ORDERNAR POR:
-      {order: [['CategoryID','ASC'],['productName','DESC']]}
     );
     res.json(products);
   } catch (error) {
