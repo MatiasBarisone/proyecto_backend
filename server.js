@@ -42,7 +42,7 @@ app.get('/productos', async (req, res) => {
 });
 
 //VIEW CON MYSQL WORKBENCH DE ORDENES JUNTANDO DOS TABLAS
-app.get('/VistaOrderDetails/:OrderID', async (req, res) => {
+app.get('/VistaOrderDetails/orders/:OrderID', async (req, res) => {
   try {
     const { orderId } = req.query; // Recibir el parámetro 'orderId' desde la URL
 
