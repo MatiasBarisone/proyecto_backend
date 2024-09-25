@@ -42,19 +42,19 @@ app.get('/productos', async (req, res) => {
 });
 
 //VIEW CON MYSQL WORKBENCH DE ORDENES JUNTANDO DOS TABLAS
-app.get('/VistaOrderDetails', async (req, res) => {
+app.get('/VistaOrderDetails/:OrderID', async (req, res) => {
   try {
-    const { orderId } = req.query; // Recibir OrderID como parámetro de consulta
+    const { orderId } = req.query; // Recibir el parámetro 'orderId' desde la URL
 
     let orders;
     if (orderId) {
-      // Si se recibe un OrderID, filtrar por ese OrderID
+      // Si se recibe un OrderID, aplicar el filtro y ordenar por ProductID de forma descendente
       orders = await VistaOrderDetails.findAll({
         where: { OrderID: orderId },
         order: [['ProductID', 'DESC']] // Ordenar por ProductID descendente
       });
     } else {
-      // Si no se recibe un OrderID, traer todas las órdenes
+      // Si no se recibe un OrderID, traer todas las órdenes ordenadas por ProductID descendente
       orders = await VistaOrderDetails.findAll({
         order: [['ProductID', 'DESC']] // Ordenar por ProductID descendente
       });
