@@ -1,0 +1,81 @@
+#obtener todos los datos
+GET http://localhost:3000/productos
+
+###
+
+#obtener los datos de productos y categorias
+GET http://localhost:3000/productsandcategories
+
+
+###
+
+#obtener las vistas de las ordenes
+GET http://localhost:3000/VistaOrderDetails/orders/2
+
+###
+
+#obtener productos por ID
+GET http://localhost:3000/productos/1
+
+###
+
+#obtener todos los empleados
+GET http://localhost:3000/empleados
+
+###
+
+//obtener producto por categoria
+GET http://localhost:3000/productos/categoria/5
+//NO FUNCIONA
+
+###
+
+#Insertar un producto
+
+POST http://localhost:3000/productos
+Content-Type: application/json
+
+{
+"ProductName":"Nuevo",
+"SupplierID" :1,
+"CategoryID": 1,
+"QuantityPerUnit": "12 uni",
+"UnitPrice":2500,
+"UnitsInStock": 524,
+"UnitsOnOrder":10 ,
+"ReorderLevel": 20,
+"Discontinued": false
+}
+
+
+###
+
+#Modificar un producto
+
+POST http://localhost:3000/1
+Content-Type: application/json
+
+{
+"ProductName":"Nuevo",
+"SupplierID" :1,
+"CategoryID": 1,
+"QuantityPerUnit": "12 uni",
+"UnitPrice":2500,
+"UnitsInStock": 524,
+"UnitsOnOrder":10 ,
+"ReorderLevel": 20,
+"Discontinued": false
+}
+
+
+###
+
+#Eliminar un producto
+
+DELETE http://localhost:3000/1
+###
+
+#obtener todos las categorias
+GET http://localhost:3000/categorias
+
+###

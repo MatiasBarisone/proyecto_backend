@@ -4,12 +4,12 @@ const { DataTypes } = require('sequelize')
 const Product = sequelize.define(
   'Product',
   {
-    productID: {
+    ProductID: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    productName: {
+    ProductName: {
       type: DataTypes.STRING,
       allowNull: false,
     },

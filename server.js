@@ -1,175 +1,261 @@
-const express = require("express");
-const { Employees } = require("./src/modelos/employees");
-const { Product } = require("./src/modelos/product");
-const { ProductCategoryView } = require("./src/modelos/productsandcategories");
-const { VistaOrderDetails } = require("./src/modelos/VistaOrderDetails");
+const { Product } = require('./src/modelos/product')
+const { Employees } = require('./src/modelos/employees')
+const { ProductCategoryView } = require('./src/modelos/productsandcategories')
+const { Category } = require('./src/modelos/category')
 
-const { sequelize } = require("./src/conexion/connection");
-const { Op } = require("sequelize");
-const app = express();
-const PORT = process.env.PORT || 3000;
+const { sequelize } = require('./src/conexion/connection')
+const { Op } = require('sequelize')
+const express = require('express')
+const app = express()
+const port = 3000
 
-// Conectar a la base de datos antes de iniciar el servidor
-sequelize
-  .authenticate()
-  .then(() => {
-    console.log("Conexión establecida con éxito!");
+app.use(express.json())
+app.use(async (req, res, next) => {
+  try {
+    await sequelize.authenticate()
+    console.log('Conexión establecida con exito ! =)')
+    await Product.sync()
+    await Employees.sync()
+    next()
+  } catch (error) {
+    res.status(500).json({ error: `Error en el servidor: `, description: error.message })
+  }
+})
 
-    // Iniciar el servidor en el puerto definido solo después de que la conexión sea exitosa
-    app.listen(PORT, () => {
-      console.log(`Servidor escuchando en el puerto ${PORT}`);
-    });
-  })
-  .catch((error) => {
-    console.error("No me pude conectar porque sucedió: ", error);
-  });
+app.get('/', (req, res) => {
+  res.json('Hello World!')
+})
 
-// Endpoint para obtener todos los productos
-app.get("/productos", async (req, res) => {
+app.get('/productosycategorias', async (req, res) => {
+  try {
+    const products = await ProductCategoryView.findAll(
+    )
+    products.length > 0 ? res.status(200).json(products)
+      : res.status(404).json({ error: "No encontramos productos cargados" })
+  } catch (error) {
+    res.status(500).json({ error: `Error en el servidor: `, description: error.message })
+  }
+})
+
+app.get('/productos', async (req, res) => {
   try {
     const products = await Product.findAll(
-      //ORDERNAR POR:
-      {
-        order: [
-          ["CategoryID", "ASC"],
-          ["productName", "DESC"],
-        ],
-      }
-    );
-    res.json(products);
+      { order: [['CategoryID', 'ASC'], ['productName', 'DESC']] }
+    )
+    products.length > 0 ? res.status(200).json(products)
+      : res.status(404).json({ error: "No encontramos productos cargados" })
   } catch (error) {
-    console.error("Error al obtener los productos:", error);
-    res
-      .status(500)
-      .json({ error: "Ocurrió un error al obtener los productos" });
+    res.status(500).json({ error: `Error en el servidor: `, description: error.message })
   }
-});
+})
 
-//VIEW CON MYSQL WORKBENCH DE ORDENES JUNTANDO DOS TABLAS
-app.get("/VistaOrderDetails/orders/:OrderID", async (req, res) => {
+
+app.get('/categorias', async (req, res) => {
   try {
-    const { orderId } = req.query; // Recibir el parámetro 'orderId' desde la URL
+    const categorias = await Category.findAll()
+    categorias.length > 0 ? res.status(200).json(categorias)
+      : res.status(404).json({ error: "No encontramos productos cargados" })
+  } catch (error) {
+    res.status(500).json({ error: `Error en el servidor: `, description: error.message })
+  }
+})
 
-    let orders;
-    if (orderId) {
-      // Si se recibe un OrderID, aplicar el filtro y ordenar por ProductID de forma descendente
-      orders = await VistaOrderDetails.findAll({
-        where: { OrderID: orderId },
-        order: [["ProductID", "DESC"]], // Ordenar por ProductID descendente
-      });
-    } else {
-      // Si no se recibe un OrderID, traer todas las órdenes ordenadas por ProductID descendente
-      orders = await VistaOrderDetails.findAll({
-        order: [["ProductID", "DESC"]], // Ordenar por ProductID descendente
-      });
+app.get('/categorias/:CategoryID', async (req, res) => {
+  try {
+    const categorias = await Category.findAll()
+    categorias.length > 0 ? res.status(200).json(categorias)
+      : res.status(404).json({ error: "No encontramos productos cargados" })
+  } catch (error) {
+    res.status(500).json({ error: `Error en el servidor: `, description: error.message })
+  }
+})
+
+
+app.get('/productos/:ProductID', async (req, res) => {
+  try {
+    const { ProductID } = req.params
+    const product = await Product.findByPk(ProductID)
+    product ? res.json(product)
+      : res.status(404).json({ error: "Producto no encontrado" })
+  } catch (error) {
+    res.status(500).json({ error: `Error en el servidor: `, description: error.message })
+  }
+})
+
+app.get('/productos/nombre/:ProductName', async (req, res) => {
+  try {
+    const { ProductName } = req.params
+    const product = await Product.findOne({ where: { ProductName } })
+    product ? res.json(product)
+      : res.status(404).json({ error: "Producto no encontrado" })
+  } catch (error) {
+    res.status(500).json({ error: `Error en el servidor: `, description: error.message })
+  }
+})
+
+app.get('/productos/categoria/:CategoryID', async (req, res) => {
+  try {
+    const { CategoryID } = req.params
+    const products = await Product.findAll({ where: { CategoryID } })
+    products ? res.json(products)
+      : res.status(404).json({ error: "Producto no encontrado" })
+  } catch (error) {
+    res.status(500).json({ error: `Error en el servidor: `, description: error.message })
+  }
+})
+
+app.get('/productos/buscar/:query', async (req, res) => {
+  try {
+    const { query } = req.params
+    const product = await Product.findAll({
+      where:
+      {
+        productName: {
+          [Op.like]: `%${query}%`
+        }
+      }
+    })
+    product ? res.json(product)
+      : res.status(404).json({ error: "Producto no encontrado" })
+  } catch (error) {
+    res.status(500).json({ error: `Error en el servidor: `, description: error.message })
+  }
+})
+
+app.get('/productos/importeMayor/:query', async (req, res) => {
+  try {
+    const { query } = req.params
+    const product = await Product.findAll({
+      where:
+      {
+        UnitPrice: {
+          [Op.gt]: query
+        }
+      },
+      order: [['UnitPrice', 'ASC']]
+    })
+    product ? res.json(product)
+      : res.status(404).json({ error: "Producto no encontrado" })
+  } catch (error) {
+    res.status(500).json({ error: `Error en el servidor: `, description: error.message })
+  }
+})
+
+app.get('/productos/:campo/:valor', async (req, res) => {
+  try {
+    const { campo, valor } = req.params
+    const query = { [campo]: valor }
+    const product = await Product.findOne({ where: { query } })
+    product ? res.json(product)
+      : res.status(404).json({ error: "Producto no encontrado" })
+  } catch (error) {
+    res.status(500).json({ error: `Error en el servidor: `, description: error.message })
+  }
+})
+
+app.get('/empleados', async (req, res) => {
+  try {
+    const employees = await Employees.findAll()
+    employees.length > 0 ? res.status(200).json(employees)
+      : res.status(404).json({ error: "No encontramos empleados cargados" })
+  } catch (error) {
+    res.status(500).json({ error: `Error en el servidor: `, description: error.message })
+  }
+})
+
+app.post('/productos', async (req, res) => {
+  try {
+    // Tomamos todos los datos desde el body
+    const {
+      ProductName,
+      SupplierID,
+      CategoryID,
+      QuantityPerUnit,
+      UnitPrice,
+      UnitsInStock,
+      UnitsOnOrder,
+      ReorderLevel,
+      Discontinued
+    } = req.body
+    // Hacemos el INSERT mediante sequelize
+    const product = await Product.create({
+      ProductName,
+      SupplierID,
+      CategoryID,
+      QuantityPerUnit,
+      UnitPrice,
+      UnitsInStock,
+      UnitsOnOrder,
+      ReorderLevel,
+      Discontinued
+    })
+    // Devolvemos en la response el código 201 con el producto
+    res.status(201).json(product)
+  } catch (error) {
+    res.status(500).json({ error: `Ocurrio un error`, message: `error: ${error.message}` })
+  }
+})
+
+app.put('/productos/:ProductID', async (req, res) => {
+  try {
+    // Tomamos el parametro
+    const { ProductID } = req.params
+    // Tomamos todos los datos desde el body
+    const {
+      ProductName,
+      SupplierID,
+      CategoryID,
+      QuantityPerUnit,
+      UnitPrice,
+      UnitsInStock,
+      UnitsOnOrder,
+      ReorderLevel,
+      Discontinued
+    } = req.body
+    // Hacemos el UPDATE mediante sequelize
+    const [productToUpdate] = await Product.update({
+      ProductName,
+      SupplierID,
+      CategoryID,
+      QuantityPerUnit,
+      UnitPrice,
+      UnitsInStock,
+      UnitsOnOrder,
+      ReorderLevel,
+      Discontinued
+    },
+      { where: { ProductID } }
+    )
+    if (productToUpdate === 0) {
+      res.status(404).json({ error: "Producto no encontrado" })
     }
 
-    // Enviar la respuesta con los resultados
-    res.json(orders);
+    // Devolvemos en la response el código 201 con el producto
+    const product = await Product.findByPk(ProductID)
+    res.json(product)
   } catch (error) {
-    console.error("Error al obtener las órdenes:", error);
-    res.status(500).send("Error al obtener las órdenes");
+    res.status(500).json({ error: `Ocurrio un error`, message: `error: ${error.message}` })
   }
-});
+})
 
-// BUSQUEDA POR PRODUCTOS Y CATEGORIAS
-app.get("/productsandcategories", async (req, res) => {
+app.delete('/productos/:ProductID', async (req, res) => {
   try {
-    const { productsandcategories } = req.params;
-    const product = await Product.findAll(productsandcategories);
-    product
-      ? res.json(product)
-      : res.status(404).json({ message: "Producto no encontrado" });
+    // Tomamos el parametro
+    const { ProductID } = req.params
+    // Buscamos el producto
+    const productToDelete = await Product.findByPk(ProductID)
+    // Si no encontramos el producto
+    if (!productToDelete)
+      return res.status(404).json({ error: "Producto no encontrado" })
+    // Hacemos el delete mediante sequelize
+    productToDelete.destroy()
+    // Devolvemos en la response el código 204 con mensaje vacio
+    res.status(204).send()
   } catch (error) {
-    console.error("Error al obtener el producto:", error);
-    res.status(500).json({ error: "Ocurrió un error al obtener el producto" });
+    res.status(500).json({ error: `Ocurrio un error`, message: `error: ${error.message}` })
   }
-});
+})
 
-// BUSQUEDA POR ID
-app.get("/productos/:productID", async (req, res) => {
-  try {
-    const { productID } = req.params;
-    const product = await Product.findByPk(productID);
-    product
-      ? res.json(product)
-      : res.status(404).json({ message: "Producto no encontrado" });
-  } catch (error) {
-    console.error("Error al obtener el producto:", error);
-    res.status(500).json({ error: "Ocurrió un error al obtener el producto" });
-  }
-});
-
-// BUSQUEDA POR CATEGORIA
-app.get("productos/categoria/:CategoryID", async (req, res) => {
-  try {
-    const { CategoryID } = req.params;
-    const product = await Product.findAll({ where: { CategoryID } });
-    product
-      ? res.json(product)
-      : res.status(404).json({ message: "Producto no encontrado" });
-  } catch (error) {
-    console.error("Error al obtener el producto:", error);
-    res.status(500).json({ error: "Ocurrió un error al obtener el producto" });
-  }
-});
-
-// BUSQUEDA POR QUERY
-app.get("/productos/buscar/:query", async (req, res) => {
-  try {
-    const { query } = req.params;
-    const products = await Product.findAll({
-      where: {
-        productName: {
-          [Op.like]: `%${query}%`, // Usamos LIKE en lugar de ILIKE
-        },
-      },
-    });
-
-    products.length
-      ? res.json(products)
-      : res.status(404).json({ message: "Producto no encontrado" });
-  } catch (error) {
-    console.error("Error al obtener los productos:", error);
-    res
-      .status(500)
-      .json({ error: "Ocurrió un error al obtener los productos" });
-  }
-});
-
-// BUSQUEDA POR IMPORTE MAYOR CON OPERADOR
-app.get("/productos/importeMayor/:query", async (req, res) => {
-  try {
-    const { query } = req.params;
-    const products = await Product.findAll({
-      where: {
-        UnitPrice: {
-          [Op.gt]: query,
-        },
-      },
-      //ORDENAR POR:
-      order: [["UnitPrice", "ASC"]],
-    });
-    products.length
-      ? res.json(products)
-      : res.status(404).json({ message: "Producto no encontrado" });
-  } catch (error) {
-    console.error("Error al obtener los productos:", error);
-    res
-      .status(500)
-      .json({ error: "Ocurrió un error al obtener los productos" });
-  }
-});
-
-// Endpoint para obtener todos los empleados
-app.get("/empleados", async (req, res) => {
-  try {
-    const employees = await Employees.findAll();
-    res.json(employees);
-  } catch (error) {
-    console.error("Error al obtener los empleados:", error);
-    res
-      .status(500)
-      .json({ error: "Ocurrió un error al obtener los empleados" });
-  }
-});
+app.listen(port, () => {
+  console.log(`Example app listening on http://localhost:${port}`)
+})
