@@ -8,56 +8,50 @@ const Product = sequelize.define(
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
+      allowNull: false, // No permitir null para el ID
     },
     ProductName: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: false, // Nombre del producto es obligatorio
     },
     SupplierID: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      default: 1,
+      allowNull: true,
     },
     CategoryID: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      default: 1,
+      allowNull: false, // La categoría es obligatoria
     },
     QuantityPerUnit: {
       type: DataTypes.STRING,
-      allowNull: false,
-      default: 'N/A',
+      allowNull: false, // Cantidad por unidad es obligatoria
     },
     UnitPrice: {
       type: DataTypes.DOUBLE,
-      allowNull: false,
-      default: 0.0,
+      allowNull: false, // El precio unitario no debe ser nulo
     },
     UnitsInStock: {
       type: DataTypes.SMALLINT,
-      allowNull: false,
-      default: 0,
+      allowNull: false, // Las unidades en stock son obligatorias
     },
     UnitsOnOrder: {
       type: DataTypes.SMALLINT,
-      allowNull: false,
-      default: 0,
+      allowNull: false, // Las unidades en orden son obligatorias
     },
     ReorderLevel: {
       type: DataTypes.SMALLINT,
-      allowNull: false,
-      default: 1,
+      allowNull: true,
     },
     Discontinued: {
       type: DataTypes.BOOLEAN,
-      allowNull: false,
-      default: 0,
+      allowNull: false, // No permitir nulo; por defecto es falso
+      defaultValue: false,
     },
   },
   {
     tableName: 'Products',
     timestamps: false,
   }
-)
+);
 
 module.exports = { Product }

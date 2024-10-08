@@ -3,6 +3,7 @@ const { Employees } = require('./src/modelos/employees')
 const { ProductCategoryView } = require('./src/modelos/productsandcategories')
 const { Category } = require('./src/modelos/category')
 
+
 const { sequelize } = require('./src/conexion/connection')
 const { Op } = require('sequelize')
 const express = require('express')
@@ -259,3 +260,4 @@ app.delete('/productos/:ProductID', async (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening on http://localhost:${port}`)
 })
+

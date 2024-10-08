@@ -15,7 +15,16 @@ GET http://localhost:3000/VistaOrderDetails/orders/2
 ###
 
 #obtener productos por ID
-GET http://localhost:3000/productos/1
+GET http://localhost:3000/productos/91
+
+###
+
+#Eliminar un producto
+
+DELETE http://localhost:3000/productos/90
+
+
+###
 
 ###
 
@@ -28,6 +37,7 @@ GET http://localhost:3000/empleados
 GET http://localhost:3000/productos/categoria/5
 //NO FUNCIONA
 
+
 ###
 
 #Insertar un producto
@@ -35,28 +45,25 @@ GET http://localhost:3000/productos/categoria/5
 POST http://localhost:3000/productos
 Content-Type: application/json
 
-{
-"ProductName":"Nuevo",
-"SupplierID" :1,
-"CategoryID": 1,
-"QuantityPerUnit": "12 uni",
-"UnitPrice":2500,
-"UnitsInStock": 524,
-"UnitsOnOrder":10 ,
-"ReorderLevel": 20,
-"Discontinued": false
-}
+{ "ProductName": "Queso Manchego",
+      "CategoryID": 4,
+      "QuantityPerUnit": "1 unidad",
+      "UnitPrice": 16.99,
+      "UnitsInStock": 30,
+      "UnitsOnOrder": 10
+    }
+
 
 
 ###
 
 #Modificar un producto
 
-POST http://localhost:3000/1
+PUT http://localhost:3000/productos/81
 Content-Type: application/json
 
 {
-"ProductName":"Nuevo",
+"ProductName":"UWUW",
 "SupplierID" :1,
 "CategoryID": 1,
 "QuantityPerUnit": "12 uni",
@@ -68,12 +75,8 @@ Content-Type: application/json
 }
 
 
-###
+ ### 
 
-#Eliminar un producto
-
-DELETE http://localhost:3000/1
-###
 
 #obtener todos las categorias
 GET http://localhost:3000/categorias
